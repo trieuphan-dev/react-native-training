@@ -1,65 +1,64 @@
 import React from 'react';
-import { StyleSheet, Text, View, Alert, SafeAreaView, Button } from 'react-native';
+import { SafeAreaView, View, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Constants from 'expo-constants';
 
-function Separator() {
-  return <View style={styles.separator} />
+const DATA = [
+  {
+    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    title: 'First Item',
+  },
+  {
+    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+    title: 'Second Item',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d72',
+    title: 'Third Item',
+  },
+];
+
+function Item({ id, title, selected, onSelect }) {
+  return (
+    <TouchableOpacity
+      onPress={() => onSelect(id)}
+      style={[
+        styles.item,
+        { backgroundColor: selected ? '#6e3b6e' : '#f9c2ff' },
+      ]}>
+      <Text style={styles.title}>{title}</Text>
+    </TouchableOpacity>
+  );
 }
+
 export default function App() {
+
+  const [selected, setSelected] = React.useState(new Map());
+  const onSelect = React.useCallback(
+    id => {
+      const newSelected = new Map(selected);
+      console.log("id = " + id);
+      newSelected.set(id, !selected.get(id));
+
+      setSelected(newSelected);
+    },
+    [selected],
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <View>
-         <Text style={styles.title}>
-          The title and onPress handler are required. It is recommended to set
-          accessibilityLabel to help make your app usable by everyone.
-        </Text>
-        <Button
-            title="Right button"
-            onPress={() => Alert.alert('Right button pressed')}
+      <FlatList
+        data={DATA}
+        renderItem={({ item }) => (
+          <Item
+            id={item.id}
+            title={item.title}
+            selected={!!selected.get(item.id)}
+            onSelect={onSelect}
           />
-      </View>
-      <Separator />
-      <View>
-        <Text style={styles.title}>
-          Adjust the color in a way that looks standard on each platform. On
-          iOS, the color prop controls the color of the text. On Android, the
-          color adjusts the background color of the button.
-        </Text>
-        <Button
-          title="Press me"
-          color="#f194ff"
-          onPress={() => Alert.alert('Button with adjusted color pressed')}
-        />
-      </View>
-      <Separator />
-
-      <View>
-        <Text style={styles.title}>
-          All interaction for the component are disabled.
-        </Text>
-        <Button
-          title="Press me"
-          disabled
-          onPress={() => Alert.alert('Cannot press this one')}
-        />
-      </View>
-      <Separator />
-
-      <View>
-        <Text style={styles.title}>
-          This layout strategy lets the title define the width of the button.
-        </Text>
-        <View style={styles.fixToText}>
-          <Button
-            title="Left button"
-            onPress={() => Alert.alert('Left button pressed')}
-          />
-          <Button
-            title="Right button"
-            onPress={() => Alert.alert('Right button pressed')}
-          />
-        </View>
-      </View>
+        )}
+        keyExtractor={item => item.id}
+        extraData={selected}
+      />
     </SafeAreaView>
   );
 }
@@ -68,24 +67,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Constants.statusBarHeight,
+  },
+  item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
     marginHorizontal: 16,
   },
-  horizontal: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 10
-  },
-  separator: {
-    marginVertical: 8,
-    borderBottomColor: '#737373',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
   title: {
-    textAlign: 'center',
-    marginVertical: 8,
-  },
-  fixToText: {
-    flexDirection: 'row',
-    justifyContent: "space-evenly",
+    fontSize: 32,
   },
 });
